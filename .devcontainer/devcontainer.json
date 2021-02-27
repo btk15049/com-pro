@@ -11,6 +11,8 @@
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
 		"terminal.integrated.shell.linux": "/usr/bin/fish",
+		"C_Cpp.default.includePath": ["${workspaceFolder}/lib/src"],
+		"C_Cpp.default.compilerArgs": ["-DBTK"],
 		// editor 周りの設定
 		"editor.formatOnSave": true,
 		"files.insertFinalNewline": true,

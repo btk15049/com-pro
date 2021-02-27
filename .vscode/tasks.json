@@ -8,7 +8,66 @@
             "type": "shell",
             "command": "oj login ${input:contest}",
             "problemMatcher": [],
-        }
+        },
+        {
+            "label": "oj dl",
+            "type": "shell",
+            "command": "oj dl (string sub -s 4 (head -n 1 ${file})) -d $TEST_DIR",
+            "problemMatcher": [],
+            "options": {
+                "env": {
+                    "TEST_DIR": "${fileDirname}/${fileBasenameNoExtension}",
+                },
+            },
+        },
+        {
+            "label": "oj test",
+            "type": "shell",
+            "command": "echo ${file} $BUILD_ARGS -o $BIN | xargs -t g++; and oj test -c $BIN -d $TEST_DIR",
+            "problemMatcher": [],
+            "options": {
+                "env": {
+                    "BUILD_ARGS": "-DBTK -std=c++17 -Wall -Wextra -I ${workspaceFolder}/lib/src",
+                    "TEST_DIR": "${fileDirname}/${fileBasenameNoExtension}",
+                    "BIN": "${workspaceFolder}/bin/${fileBasenameNoExtension}.out"
+                },
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+        },
+        {
+            "label": "expand header",
+            "type": "shell",
+            "command": "python3 ${workspaceFolder}/util/resolve_includes.py ${file} $LIB; and clang-format -i ${file}",
+            "problemMatcher": [],
+            "options": {
+                "env": {
+                    "LIB": "${workspaceFolder}/lib/src",
+                },
+            },
+        },
+        {
+            "label": "oj submit",
+            "type": "shell",
+            "command": "echo ${file} $BUILD_ARGS -o $BIN | xargs -t g++;and oj submit (string sub -s 4 (head -n 1 ${file})) ${file}",
+            "problemMatcher": [],
+            "options": {
+                "env": {
+                    "BUILD_ARGS": "-std=c++17 -Wall -Wextra",
+                    "BIN": "${workspaceFolder}/bin/${fileBasenameNoExtension}.out"
+                },
+            },
+        },     
     ], 
     "inputs": [
         {

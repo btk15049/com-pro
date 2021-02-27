@@ -14,6 +14,7 @@ RUN apt update -y && apt upgrade -y \
     g++-9 \
     libssl-dev \
     python3-pip \
+    clang-format \
     && apt-get clean
 
 ENV CC gcc-9
