@@ -1,6 +1,4 @@
 // https://atcoder.jp/contests/abc193/tasks/abc193_e
-#define CIN_ONLY
-#define DECIMAL_DIGITS 10
 #define STATIC_MOD 1e9 + 7
 
 #ifdef BTK
@@ -47,112 +45,32 @@ inline std::vector<T> wrapGrid(std::vector<T> grid, U material) {
 constexpr int dr4[] = {0, 1, 0, -1};
 constexpr int dc4[] = {-1, 0, 1, 0};
 /* #endregion */
-/* #region template/Macro.hpp*/
-/**
- * @file Macro.hpp
- * @author btk
- * @brief マクロとか，LLとか
- * @version 0.1
- * @date 2019-07-13
- *
- * @copyright Copyright (c) 2019
- *
- */
-
-
-//! LL
-using LL = long long;
-
-/**
- * @def DEBUG
- * @brief デバッグ用のif文 提出時はif(0)で実行されない
- */
-
-/*</head>*/
-#    ifdef BTK
-#        define DEBUG if (1)
-#    else
-#        ifdef CIN_ONLY
-#            define FAST_IO
-#        endif
-#        define DEBUG if (0)
-#    endif
-/**
- * @def ALL(v)
- * @brief
- * ALLマクロ
- */
-#    define ALL(v) (v).begin(), (v).end()
-
-/**
- * @def REC(ret, ...)
- * @brief
- * 再帰ラムダをするためのマクロ
- */
-#    define REC(ret, ...) std::function<ret(__VA_ARGS__)>
-
-/**
- * @def VAR_NAME(var)
- * @brief 変数名を取得する
- */
-#    define VAR_NAME(var) #    var
-
-/**
- * @brief
- * rangeで生まれる使わない変数を消す用（警告消し）
- */
-template <typename T>
-inline T& unused_var(T& v) {
-    return v;
-}
-
-template <typename T>
-std::vector<T> nestingVector(std::size_t size) {
-    return std::vector<T>(size);
-}
-
-template <typename T, typename... Ts>
-inline auto nestingVector(std::size_t size, Ts... ts) {
-    return std::vector<decltype(nestingVector<T>(ts...))>(
-        size, nestingVector<T>(ts...));
-}
-/* #endregion */
 /* #region template/IO.hpp*/
 /**
  * @file IO.hpp
  * @author btk
  * @brief cin高速化とか，出力の小数桁固定とか
- * @version 0.1
- * @date 2019-07-13
+ * @version 0.2
+ * @date 2021-03-01
  *
- * @copyright Copyright (c) 2019
+ * @copyright Copyright (c) 2021
  */
 
 
 /**
  * @brief 入出力の設定を行うための構造体
  */
-struct cww {
-    /**
-     * @brief Construct a new cww::cww object
-     * @details
-     * CIN_ONLYを定義すると，submit時にcinとscanfの同期を切る設定が走る
-     * DECIMAL_DIGITSを定義すると，doubleの出力時指定した桁数分小数部を吐くようになる
-     */
-    cww() {
-#    ifdef FAST_IO
+
+namespace io {
+    inline void enableFastIO() {
         std::ios::sync_with_stdio(false);
         std::cin.tie(0);
-#    endif
-#    ifdef DECIMAL_DIGITS
-        std::cout << std::fixed;
-        std::cout << std::setprecision(DECIMAL_DIGITS);
-#    endif
     }
-};
-
-//! 入出力設定構造体を実体化
-cww star;
+    inline void setDigits(int digits) {
+        std::cout << std::fixed;
+        std::cout << std::setprecision(digits);
+    }
+} // namespace io
 
 /**
  * @brief
@@ -291,6 +209,70 @@ class range {
      */
     reverse_range operator!() { return reverse_range(*i, *n); }
 };
+/* #endregion */
+/* #region template/Macro.hpp*/
+/**
+ * @file Macro.hpp
+ * @author btk
+ * @brief マクロとか，LLとか
+ * @version 0.1
+ * @date 2019-07-13
+ *
+ * @copyright Copyright (c) 2019
+ *
+ */
+
+
+/**
+ * @def DEBUG
+ * @brief デバッグ用のif文 提出時はif(0)で実行されない
+ */
+
+/*</head>*/
+#    ifdef BTK
+#        define DEBUG if (1)
+#    else
+#        define DEBUG if (0)
+#    endif
+/**
+ * @def ALL(v)
+ * @brief
+ * ALLマクロ
+ */
+#    define ALL(v) (v).begin(), (v).end()
+
+/**
+ * @def REC(ret, ...)
+ * @brief
+ * 再帰ラムダをするためのマクロ
+ */
+#    define REC(ret, ...) std::function<ret(__VA_ARGS__)>
+
+/**
+ * @def VAR_NAME(var)
+ * @brief 変数名を取得する
+ */
+#    define VAR_NAME(var) #    var
+
+/**
+ * @brief
+ * rangeで生まれる使わない変数を消す用（警告消し）
+ */
+template <typename T>
+inline T& unused_var(T& v) {
+    return v;
+}
+
+template <typename T>
+std::vector<T> nestingVector(std::size_t size) {
+    return std::vector<T>(size);
+}
+
+template <typename T, typename... Ts>
+inline auto nestingVector(std::size_t size, Ts... ts) {
+    return std::vector<decltype(nestingVector<T>(ts...))>(
+        size, nestingVector<T>(ts...));
+}
 /* #endregion */
 /* #region template/ChainOperation.hpp*/
 /**
@@ -1018,6 +1000,13 @@ std::string join(const std::tuple<Ts...>& values,
 /*</body>*/
 #endif
 
+struct cww {
+    cww() {
+        io::enableFastIO();
+        io::setDigits(10);
+    }
+} star;
+
 // clang-format off
 // 周期 C = 2X + 2Y のうち、Xのときに街Bに到着する
 // 周期 D = P + Q のうち、区間 E = (P-Y, P+Q) の間に街Bに到着すれば降りられる
@@ -1025,42 +1014,42 @@ std::string join(const std::tuple<Ts...>& values,
 // [Cx+X, Cx+X+Y] と [Dy+P, Dy+P+Q] が交差するポイントの最小の点が答え = max(Cx+X, Dy+P)
 // clang-format on
 void solve() {
-    LL X, Y, P, Q;
+    int64_t X, Y, P, Q;
     cin >> X >> Y >> P >> Q;
-    const LL C   = 2 * X + 2 * Y;
-    const LL D   = P + Q;
-    const LL inf = numeric_limits<LL>::max();
-    LL ret       = inf;
+    const int64_t C   = 2 * X + 2 * Y;
+    const int64_t D   = P + Q;
+    const int64_t inf = numeric_limits<int64_t>::max();
+    int64_t ret       = inf;
     int64_t x, y;
-    const LL g = math::extgcd(C, D, x, y);
-    const LL l = (C / g) * D;
+    const int64_t g = math::extgcd(C, D, x, y);
+    const int64_t l = (C / g) * D;
 
     // Cx + Dy = g ==> Cx - D(-y) = g;
-    for (LL z = P - Y + 1; z < P + Q; z++) {
-        const LL w = z - X;
+    for (int64_t z = P - Y + 1; z < P + Q; z++) {
+        const int64_t w = z - X;
         if (w % g != 0) continue;
-        LL tx = x * (w / g);
-        LL ty = y * (w / g);
+        int64_t tx = x * (w / g);
+        int64_t ty = y * (w / g);
         // Ctx + Dty = X-z;
         // tyを負にする必要がある
         // cerr << w << endl;
         // cerr << tx << " " << ty << endl;
         if (tx < 0) {
-            const LL d = math::ceil(-tx, l / C);
+            const int64_t d = math::ceil(-tx, l / C);
             tx += d * (l / C);
             ty -= d * (l / D);
         }
         if (ty > 0) {
-            const LL d = math::ceil(ty, l / D);
+            const int64_t d = math::ceil(ty, l / D);
             tx += d * (l / C);
             ty -= d * (l / D);
         }
         {
-            const LL d = min(tx / (l / C), -ty / (l / D));
+            const int64_t d = min(tx / (l / C), -ty / (l / D));
             tx -= d * (l / C);
             ty += d * (l / D);
         }
-        const LL cand = max(C * tx + X, D * -ty + P);
+        const int64_t cand = max(C * tx + X, D * -ty + P);
         // cerr << tx << " " << ty << " " << cand << endl;
         chmin(ret, cand);
     }
