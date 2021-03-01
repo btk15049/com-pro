@@ -13,13 +13,14 @@
 		"terminal.integrated.shell.linux": "/usr/bin/fish",
 		"C_Cpp.default.includePath": ["${workspaceFolder}/lib/src"],
 		"C_Cpp.default.compilerArgs": ["-DBTK"],
+		"C_Cpp.default.cppStandard": "c++17",
 		// editor 周りの設定
 		"editor.formatOnSave": true,
 		"files.insertFinalNewline": true,
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": ["ms-vscode.cpptools", "esbenp.prettier-vscode"],
+	"extensions": ["ms-vscode.cpptools", "esbenp.prettier-vscode", "cschlosser.doxdocgen"],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
