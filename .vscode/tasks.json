@@ -1,80 +1,114 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "oj login",
-            "type": "shell",
-            "command": "oj login ${input:contest}",
-            "problemMatcher": [],
-        },
-        {
-            "label": "oj dl",
-            "type": "shell",
-            "command": "oj dl (string sub -s 4 (head -n 1 ${file})) -d $TEST_DIR",
-            "problemMatcher": [],
-            "options": {
-                "env": {
-                    "TEST_DIR": "${fileDirname}/${fileBasenameNoExtension}",
-                },
-            },
-        },
-        {
-            "label": "oj test",
-            "type": "shell",
-            "command": "echo ${file} $BUILD_ARGS -o $BIN | xargs -t g++; and oj test -c $BIN -d $TEST_DIR",
-            "problemMatcher": [],
-            "options": {
-                "env": {
-                    "BUILD_ARGS": "-DBTK -std=c++17 -Wall -Wextra -I ${workspaceFolder}/lib/src",
-                    "TEST_DIR": "${fileDirname}/${fileBasenameNoExtension}",
-                    "BIN": "${workspaceFolder}/bin/${fileBasenameNoExtension}.out"
-                },
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-        },
-        {
-            "label": "expand header",
-            "type": "shell",
-            "command": "python3 ${workspaceFolder}/util/resolve_includes.py ${file} $LIB; and clang-format -i ${file}",
-            "problemMatcher": [],
-            "options": {
-                "env": {
-                    "LIB": "${workspaceFolder}/lib/src",
-                },
-            },
-        },
-        {
-            "label": "oj submit",
-            "type": "shell",
-            "command": "echo ${file} $BUILD_ARGS -o $BIN | xargs -t g++;and oj submit (string sub -s 4 (head -n 1 ${file})) ${file}",
-            "problemMatcher": [],
-            "options": {
-                "env": {
-                    "BUILD_ARGS": "-std=c++17 -Wall -Wextra",
-                    "BIN": "${workspaceFolder}/bin/${fileBasenameNoExtension}.out"
-                },
-            },
-        },     
-    ], 
-    "inputs": [
-        {
-            "id": "contest",
-            "description": "select contest",
-            "type": "pickString",
-            "options": ["https://atcoder.jp/"]
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "oj login",
+      "type": "shell",
+      "command": "oj login ${input:contest}",
+      "problemMatcher": []
+    },
+    {
+      "label": "oj dl",
+      "type": "shell",
+      "command": "fish ${workspaceFolder}/.vscode/scripts/dl.fish",
+      "problemMatcher": [],
+      "options": {
+        "env": {
+          "FILE": "${file}",
+          "TEST_DIR": "${fileDirname}/${fileBasenameNoExtension}"
         }
-    ]
+      }
+    },
+    {
+      "label": "setup",
+      "type": "shell",
+      "command": "fish ${workspaceFolder}/.vscode/scripts/setup.fish",
+      "problemMatcher": [],
+      "options": {
+        "env": {
+          "TEMPLATE": "${workspaceFolder}/${input:template}",
+          "URL": "${input:problemUrl}",
+          "FILE": "${file}",
+          "TEST_DIR": "${fileDirname}/${fileBasenameNoExtension}"
+        }
+      }
+    },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "fish ${workspaceFolder}/.vscode/scripts/test.fish",
+      "problemMatcher": [],
+      "options": {
+        "env": {
+          "FILE": "${file}",
+          "LIB": "${workspaceFolder}/lib/src",
+          "TEST_DIR": "${fileDirname}/${fileBasenameNoExtension}"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "expand header",
+      "type": "shell",
+      "command": "fish ${workspaceFolder}/.vscode/scripts/expand_header.fish",
+      "problemMatcher": [],
+      "options": {
+        "env": {
+          "FILE": "${file}",
+          "LIB": "${workspaceFolder}/lib/src"
+        }
+      }
+    },
+    {
+      "label": "submit",
+      "type": "shell",
+      "command": "fish ${workspaceFolder}/.vscode/scripts/submit.fish",
+      "problemMatcher": [],
+      "options": {
+        "env": {
+          "FILE": "${file}",
+          "LIB": "${workspaceFolder}/lib/src",
+          "USE_EXPAND": "${input:useExpand}"
+        }
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "contest",
+      "description": "select contest",
+      "type": "pickString",
+      "options": ["https://atcoder.jp/"]
+    },
+    {
+      "id": "problemUrl",
+      "description": "input problem url",
+      "type": "promptString"
+    },
+    {
+      "id": "template",
+      "description": "select template",
+      "type": "pickString",
+      "options": [".vscode/templates/normal.cpp"]
+    },
+    {
+      "id": "useExpand",
+      "description": "use expand",
+      "type": "pickString",
+      "options": ["false", "true"]
+    }
+  ]
 }
