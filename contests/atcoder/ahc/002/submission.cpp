@@ -11,7 +11,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-constexpr int TIMEOUT_MS = 1900;
+constexpr int TIMEOUT_MS           = 1980;
+constexpr int BACK_LEN_THRESHOLD   = 20;
+constexpr int MIDDLE_LEN_THRESHOLD = 20;
 
 using namespace std;
 
@@ -379,8 +381,8 @@ namespace v1 {
         if (a == b) {
             b++;
         }
-        if (b > a + 20) {
-            b = a + 20;
+        if (b > a + MIDDLE_LEN_THRESHOLD) {
+            b = a + MIDDLE_LEN_THRESHOLD;
         }
 
         a++;
@@ -430,8 +432,8 @@ namespace v1 {
         testBackTotal++;
         Model model = master;
         int n       = model.seq.size();
-        if (n > 20) {
-            n = 20;
+        if (n > BACK_LEN_THRESHOLD) {
+            n = BACK_LEN_THRESHOLD;
         }
         int len = random::gen.next_int() % n;
         while (len--) {
