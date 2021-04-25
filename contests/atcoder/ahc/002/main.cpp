@@ -11,6 +11,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+constexpr int TIMEOUT_MS = 1900;
+
 using namespace std;
 
 namespace {
@@ -294,9 +296,12 @@ namespace v1 {
             MIDDLE = 5000,
         };
         const vector<int> lbs = {BACK, MIDDLE};
-        int getMode() {
+        inline int getMode() {
             return *lower_bound(lbs.begin(), lbs.end(),
                                 gen.next_int() % lbs.back());
+        }
+        inline double getDouble() {
+            return gen.next_int() / double(gen.range_max());
         }
     } // namespace random
 
@@ -341,14 +346,28 @@ namespace v1 {
         return false;
     }
 
+    namespace ss {
+        constexpr double sTemp = 100;
+        constexpr double gTemp = 1;
+        int currentMs          = 0;
+        inline bool f(int nextScore, int currentScore) {
+            if (nextScore > currentScore) return true;
+            const double temp =
+                sTemp + (gTemp - sTemp) * currentMs / double(TIMEOUT_MS);
+            const double p = exp((nextScore - currentScore) / temp);
+            return p > random::getDouble();
+        }
+
+    } // namespace ss
     Model master;
+    int bestScore = 0;
 
     int updateMiddleTotal = 0;
     int updateMiddleSkip  = 0;
     void updateMiddle() {
         updateMiddleTotal++;
         if (master.seq.size() <= 1u) return;
-        vector<Point> suffix;
+
 
         const int n = master.seq.size();
 
@@ -360,12 +379,16 @@ namespace v1 {
         if (a == b) {
             b++;
         }
+        if (b > a + 20) {
+            b = a + 20;
+        }
 
         a++;
         b     = n - b;
         int m = n - a - b;
 
         Model test = master;
+        vector<Point> suffix;
         suffix.reserve(b);
 
         BS usedTile = test.used;
@@ -386,7 +409,7 @@ namespace v1 {
             return;
         }
 
-        if (score > master.score) {
+        if (ss::f(score, master.score)) {
             for (auto& p : middle) {
                 test.pushBack(p);
             }
@@ -395,6 +418,9 @@ namespace v1 {
                 test.pushBack(p);
             }
             master = test;
+            if (bestScore < master.score) {
+                bestScore = master.score;
+            }
         }
     }
 
@@ -403,14 +429,21 @@ namespace v1 {
     void testBack() {
         testBackTotal++;
         Model model = master;
-        int len     = random::gen.next_int() % model.seq.size();
+        int n       = model.seq.size();
+        if (n > 20) {
+            n = 20;
+        }
+        int len = random::gen.next_int() % n;
         while (len--) {
             model.popBack();
         }
 
         randomWork1(model);
-        if (model.score > master.score) {
+        if (ss::f(model.score, master.score)) {
             master = model;
+            if (bestScore < master.score) {
+                bestScore = master.score;
+            }
         }
         else {
             testBackSkip++;
@@ -423,11 +456,24 @@ namespace v1 {
         randomWork1(master);
 
 
-        while (timer::getCurrentMs() < 100) {
+        for (; (ss::currentMs = timer::getCurrentMs()) < 10;) {
             testBack();
         }
 
-        while (timer::getCurrentMs() < 1900) {
+        constexpr int x = TIMEOUT_MS * 0.8;
+        for (; (ss::currentMs = timer::getCurrentMs()) < x;) {
+            for (int i = 0; i < 100; i++) {
+                switch (random::getMode()) {
+                    case random::BACK: {
+                        testBack();
+                    } break;
+                    case random::MIDDLE: {
+                        updateMiddle();
+                    } break;
+                }
+            }
+        }
+        for (; (ss::currentMs = timer::getCurrentMs()) < TIMEOUT_MS;) {
             switch (random::getMode()) {
                 case random::BACK: {
                     testBack();
@@ -450,6 +496,7 @@ namespace v1 {
            << endl;
         ss << "back: " << testBackSkip << "/" << testBackTotal << endl;
         ss << "score: " << master.score << endl;
+        ss << "best: " << bestScore << endl;
         cerr << ss.str() << endl;
     }
 } // namespace v1
