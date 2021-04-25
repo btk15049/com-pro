@@ -8,6 +8,8 @@
     "args": { "VARIANT": "focal" }
   },
 
+  "runArgs": ["--network=parallel-tester-network"],
+
   // Set *default* container specific settings.json values on container create.
   "settings": {
     "terminal.integrated.shell.linux": "/usr/bin/fish",
