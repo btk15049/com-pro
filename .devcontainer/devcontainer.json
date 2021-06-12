@@ -8,13 +8,16 @@
     "args": { "VARIANT": "focal" }
   },
 
-  "runArgs": ["--network=parallel-tester-network"],
+  "runArgs": [
+    // "--network=parallel-tester-network",
+    // "--link=parallel-tester:parallel-tester"
+  ],
 
   // Set *default* container specific settings.json values on container create.
   "settings": {
     "terminal.integrated.shell.linux": "/usr/bin/fish",
     "C_Cpp.default.includePath": ["${workspaceFolder}/lib/src"],
-    "C_Cpp.default.compilerArgs": ["-DBTK"],
+    "C_Cpp.default.defines": ["BTK", "VSCODE"],
     "C_Cpp.default.cppStandard": "c++17",
     // editor 周りの設定
     "editor.formatOnSave": true,
